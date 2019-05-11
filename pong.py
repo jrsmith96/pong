@@ -1,3 +1,4 @@
+import math
 import pygame
 from pygame.locals import *
 
@@ -56,8 +57,31 @@ def main():
       # Increase screen with each bounce
       self.speed *= 1.1
 
+    # Update the position of the ball
     def update(self):
+      # Convert sin and cos
+      direction_radians = math.radians(self.direction)
+      # Change position according to speed and direction
+      self.x += self.speed * math.sin(direction_radians)
+      self.y -= self.speed * math.cos(direction_radians)
 
+      if self.y < 0:
+        self.reset()
+
+      if self.y > 600:
+        self.reset()
+
+      # Move image
+      self.rect.x = self.x
+      self.rect.y = self.y
+
+      # Manage bouncing off the sides of the screen
+      if self.x < 0:
+        self.direction = (360 - self.direction) % 360
+        print(self.direction)
+
+      if self.x > self.screenwidth - self.width:
+        self.direction = (360 - self.direction) % 360
 
   while True:
     for event in pygame.event.get():
