@@ -46,9 +46,6 @@ class Ball(pygame.sprite.Sprite):
     self.direction = direction
     self.y = pygame.display.get_surface().get_height() / 2
 
-      # Have the ball wait in the centre for the players to have some time in between rallies
-      # pygame.time.wait(2000)
-
   def bounce(self, diff):
     self.direction = (180 - self.direction) % 360
     self.direction -= diff
@@ -68,12 +65,15 @@ class Ball(pygame.sprite.Sprite):
       global SCORE_1
       SCORE_1 += 1
       self.reset(0)
+      player1.reset()
+      player2.reset()
       
-
     if self.y > 600:
       global SCORE_2
       SCORE_2 += 1
       self.reset(180)
+      player1.reset()
+      player2.reset()
 
     # Move image
     self.rect.x = self.x
@@ -118,6 +118,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.x -= 10
       elif pressed[pygame.K_RIGHT] and self.rect.x < self.screenwidth - 75:
         self.rect.x += 10
+
+  def reset(self):
+
+    self.rect.x = (pygame.display.get_surface().get_width() / 2) - 37.5
 
 # Initialize the Pygame library 
 pygame.init()
