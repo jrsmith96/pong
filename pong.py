@@ -7,6 +7,26 @@ WHITE = pygame.Color("white")
 SCORE_1 = 0
 SCORE_2 = 0
 
+PAUSED = False
+
+def pause():
+
+  while PAUSED:
+    pausedText = pygame.font.Font(None, 36)
+    text = pausedText.render("Paused", 1, (200, 200, 200))
+    textpos = text.get_rect(centerx = background.get_width() / 2)
+    textpos.top = 50
+    DISPLAY.blit(text, textpos)
+
+    for event in pygame.event.get():
+      if event.type == pygame.KEYUP:
+        if event.key == pygame.K_p:
+          unpause()
+
+def unpause():
+  global PAUSED
+  PAUSED = False
+
 class Ball(pygame.sprite.Sprite):
 
   # Constructor
@@ -129,7 +149,6 @@ pygame.init()
 DISPLAY = pygame.display.set_mode([800,600])
 pygame.display.set_caption('Pong')
 pygame.mouse.set_visible(0)
-title_font = pygame.font.Font(None, 50)
 font = pygame.font.Font(None, 36)
 background = pygame.Surface(DISPLAY.get_size())
 
@@ -156,6 +175,10 @@ while not exit_program:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       exit_program = True
+    if event.type == pygame.KEYUP:
+      if event.key == pygame.K_p:
+        PAUSED = True
+        pause()
 
   if abs(SCORE_1 - SCORE_2) > 3:
     done = True
