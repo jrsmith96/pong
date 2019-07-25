@@ -190,7 +190,10 @@ while not exit_program:
     ball.update()
 
   if done:
-    text = font.render("Game Over", 1, (200, 200, 200))
+    if SCORE_1 > SCORE_2:
+      text = font.render("Player 1 wins!", 1, (200, 200, 200))
+    else:
+      text = font.render("Player 2 wins!", 1, (200, 200, 200))
     textpos = text.get_rect(centerx = background.get_width() / 2)
     textpos.top = 50
     DISPLAY.blit(text, textpos)
