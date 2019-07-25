@@ -2,21 +2,24 @@ import math
 import pygame
 import random
 
+# Initialize the Pygame library 
+pygame.init()
+
+# Sounds
+pygame.mixer.music.load('pong_bounce.ogg')
+
 WHITE = pygame.Color("white")
 
 SCORE_1 = 0
 SCORE_2 = 0
 
 PAUSED = False
+font = pygame.font.Font(None, 36)
+value = 0
 
 def pause():
 
   while PAUSED:
-    pausedText = pygame.font.Font(None, 36)
-    text = pausedText.render("Paused", 1, (200, 200, 200))
-    textpos = text.get_rect(centerx = background.get_width() / 2)
-    textpos.top = 50
-    DISPLAY.blit(text, textpos)
 
     for event in pygame.event.get():
       if event.type == pygame.KEYUP:
@@ -67,6 +70,7 @@ class Ball(pygame.sprite.Sprite):
     self.y = pygame.display.get_surface().get_height() / 2
 
   def bounce(self, diff):
+    pygame.mixer.music.play(0)
     self.direction = (180 - self.direction) % 360
     self.direction -= diff
 
@@ -101,10 +105,11 @@ class Ball(pygame.sprite.Sprite):
 
     # Manage bouncing off the sides of the screen
     if self.x < 0:
+      pygame.mixer.music.play(0)
       self.direction = (360 - self.direction) % 360
-      print(self.direction)
 
     if self.x > self.screenwidth - self.width:
+      pygame.mixer.music.play(0)
       self.direction = (360 - self.direction) % 360
 
 class Player(pygame.sprite.Sprite):
@@ -143,13 +148,9 @@ class Player(pygame.sprite.Sprite):
 
     self.rect.x = (pygame.display.get_surface().get_width() / 2) - 37.5
 
-# Initialize the Pygame library 
-pygame.init()
-
 DISPLAY = pygame.display.set_mode([800,600])
 pygame.display.set_caption('Pong')
 pygame.mouse.set_visible(0)
-font = pygame.font.Font(None, 36)
 background = pygame.Surface(DISPLAY.get_size())
 
 ball = Ball()
