@@ -6,7 +6,8 @@ import random
 pygame.init()
 
 # Sounds
-pygame.mixer.music.load('pong_bounce.ogg')
+bounce_sound = pygame.mixer.Sound('sounds/pong_bounce.ogg')
+victory_sound = pygame.mixer.Sound('sounds/pong_victory.ogg')
 
 WHITE = pygame.Color("white")
 
@@ -70,7 +71,7 @@ class Ball(pygame.sprite.Sprite):
     self.y = pygame.display.get_surface().get_height() / 2
 
   def bounce(self, diff):
-    pygame.mixer.music.play(0)
+    pygame.mixer.Sound.play(bounce_sound)
     self.direction = (180 - self.direction) % 360
     self.direction -= diff
 
@@ -105,11 +106,11 @@ class Ball(pygame.sprite.Sprite):
 
     # Manage bouncing off the sides of the screen
     if self.x < 0:
-      pygame.mixer.music.play(0)
+      pygame.mixer.Sound.play(bounce_sound)
       self.direction = (360 - self.direction) % 360
 
     if self.x > self.screenwidth - self.width:
-      pygame.mixer.music.play(0)
+      pygame.mixer.Sound.play(bounce_sound)
       self.direction = (360 - self.direction) % 360
 
 class Player(pygame.sprite.Sprite):
