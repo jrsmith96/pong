@@ -1,13 +1,15 @@
+#!/usr/bin/env python3
+"""A simple pong game in Pygame!"""
+
 import math
 import pygame
-import random
 
-# Initialize the Pygame library 
+# Initialize the Pygame library
 pygame.init()
 
 # Sounds
-bounce_sound = pygame.mixer.Sound('sounds/pong_bounce.ogg')
-victory_sound = pygame.mixer.Sound('sounds/pong_victory.ogg')
+BOUNCE_SOUND = pygame.mixer.Sound('sounds/pong_bounce.ogg')
+VICTORY_SOUND = pygame.mixer.Sound('sounds/pong_victory.ogg')
 
 WHITE = pygame.Color("white")
 
@@ -15,29 +17,32 @@ SCORE_1 = 0
 SCORE_2 = 0
 
 PAUSED = False
-font = pygame.font.Font(None, 36)
-value = 0
+FONT = pygame.font.Font(None, 36)
+VALUE = 0
 
 def pause():
-
+  """Pauses the game"""
   while PAUSED:
 
-    for event in pygame.event.get():
-      if event.type == pygame.KEYUP:
-        if event.key == pygame.K_p:
+    for key in pygame.event.get():
+      if key.type == pygame.KEYUP:
+        if key.key == pygame.K_p:
           unpause()
 
 def unpause():
+  """Unpauses the game"""
   global PAUSED
   PAUSED = False
 
 class Ball(pygame.sprite.Sprite):
+  """Class to set the properties and behaviors of the ball"""
 
+  # pylint: disable = too-many-instance-attributes
   # Constructor
   def __init__(self):
-    super().__init__()
+    super(Ball, self).__init__()
 
-    self.image = pygame.Surface([10,  10])
+    self.image = pygame.Surface([10, 10])
     self.image.fill(WHITE)
 
     # Ball hitspace
@@ -48,8 +53,8 @@ class Ball(pygame.sprite.Sprite):
     self.speed = 0
 
     # Ball pos
-    self.x = 0
-    self.y = 0
+    self._x = 0
+    self._y = 0
 
     # Ball direction
     self.direction = 0
@@ -62,16 +67,17 @@ class Ball(pygame.sprite.Sprite):
     self.reset(0)
 
   def reset(self, direction):
-
-    self.x = pygame.display.get_surface().get_width() / 2
-    self.y = pygame.display.get_surface().get_height() / 2
+    """Resets the ball after a player has scored"""
+    self._x = pygame.display.get_surface().get_width() / 2
+    self._y = pygame.display.get_surface().get_height() / 2
     self.speed = 8.0
 
     self.direction = direction
-    self.y = pygame.display.get_surface().get_height() / 2
+    self._y = pygame.display.get_surface().get_height() / 2
 
   def bounce(self, diff):
-    pygame.mixer.Sound.play(bounce_sound)
+    """Executes whenever the ball bounces off a player"""
+    pygame.mixer.Sound.play(BOUNCE_SOUND)
     self.direction = (180 - self.direction) % 360
     self.direction -= diff
 
@@ -80,47 +86,49 @@ class Ball(pygame.sprite.Sprite):
 
   # Update the position of the ball
   def update(self):
+    """Constantly running function that determines the ball's movement and position"""
     # Convert sin and cos
     direction_radians = math.radians(self.direction)
     # Change position according to speed and direction
-    self.x += self.speed * math.sin(direction_radians)
-    self.y -= self.speed * math.cos(direction_radians)
+    self._x += self.speed * math.sin(direction_radians)
+    self._y -= self.speed * math.cos(direction_radians)
 
-    if self.y < 0:
+    if self._y < 0:
       global SCORE_1
       SCORE_1 += 1
       self.reset(0)
-      player1.reset()
-      player2.reset()
-      
-    if self.y > 600:
+      PLAYER_1.reset()
+      PLAYER_2.reset()
+
+    if self._y > 600:
       global SCORE_2
       SCORE_2 += 1
       self.reset(180)
-      player1.reset()
-      player2.reset()
+      PLAYER_1.reset()
+      PLAYER_2.reset()
 
     # Move image
-    self.rect.x = self.x
-    self.rect.y = self.y
+    self.rect.x = self._x
+    self.rect.y = self._y
 
     # Manage bouncing off the sides of the screen
-    if self.x < 0:
-      pygame.mixer.Sound.play(bounce_sound)
+    if self._x < 0:
+      pygame.mixer.Sound.play(BOUNCE_SOUND)
       self.direction = (360 - self.direction) % 360
 
-    if self.x > self.screenwidth - self.width:
-      pygame.mixer.Sound.play(bounce_sound)
+    if self._x > self.screenwidth - self.width:
+      pygame.mixer.Sound.play(BOUNCE_SOUND)
       self.direction = (360 - self.direction) % 360
 
 class Player(pygame.sprite.Sprite):
-  def __init__(self, y_pos, playerNumber):
-    super().__init__()
+  """Class to set the properties and behaviors of the player"""
+  def __init__(self, y_pos, player_num):
+    super(Player, self).__init__()
 
-    self.playerNumber = playerNumber
+    self.player_number = player_num
 
-    self.width=75
-    self.height=15
+    self.width = 75
+    self.height = 15
     self.image = pygame.Surface([self.width, self.height])
     self.image.fill(WHITE)
 
@@ -132,101 +140,101 @@ class Player(pygame.sprite.Sprite):
     self.rect.y = y_pos
 
   def update(self):
-
+    """Constantly running function that controls the player's movement and position"""
     pressed = pygame.key.get_pressed()
-    if self.playerNumber == 1:
+    if self.player_number == 1:
       if pressed[pygame.K_a] and self.rect.x > 10:
         self.rect.x -= 10
       elif pressed[pygame.K_d] and self.rect.x < self.screenwidth - 75:
         self.rect.x += 10
-    elif self.playerNumber == 2:
+    elif self.player_number == 2:
       if pressed[pygame.K_LEFT] and self.rect.x > 10:
         self.rect.x -= 10
       elif pressed[pygame.K_RIGHT] and self.rect.x < self.screenwidth - 75:
         self.rect.x += 10
 
   def reset(self):
-
+    """Resets the player back to the center of the screen after a point is scored"""
     self.rect.x = (pygame.display.get_surface().get_width() / 2) - 37.5
 
-DISPLAY = pygame.display.set_mode([800,600])
+DISPLAY = pygame.display.set_mode([800, 600])
 pygame.display.set_caption('Pong')
 pygame.mouse.set_visible(0)
-background = pygame.Surface(DISPLAY.get_size())
+BACKGROUND = pygame.Surface(DISPLAY.get_size())
 
-ball = Ball()
-balls = pygame.sprite.Group()
-balls.add(ball)
+BALL = Ball()
+BALLS = pygame.sprite.Group()
+BALLS.add(BALL)
 
-player1 = Player(580, 1)
-player2 = Player(25, 2)
+PLAYER_1 = Player(580, 1)
+PLAYER_2 = Player(25, 2)
 
-movingsprites = pygame.sprite.Group()
-movingsprites.add(player1)
-movingsprites.add(player2)
-movingsprites.add(ball)
+MOVING_SPRITES = pygame.sprite.Group()
+MOVING_SPRITES.add(PLAYER_1)
+MOVING_SPRITES.add(PLAYER_2)
+MOVING_SPRITES.add(BALL)
 
-clock = pygame.time.Clock()
-done = False
-exit_program = False
+CLOCK = pygame.time.Clock()
+DONE = False
+EXIT_PROGRAM = False
 
-while not exit_program:
+while not EXIT_PROGRAM:
 
   DISPLAY.fill(pygame.Color("black"))
 
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
-      exit_program = True
+      EXIT_PROGRAM = True
     if event.type == pygame.KEYUP:
       if event.key == pygame.K_p:
         PAUSED = True
         pause()
 
   if abs(SCORE_1 - SCORE_2) > 3:
-    done = True
+    DONE = True
 
-  if not done:
-    player1.update()
-    player2.update()
-    ball.update()
+  if not DONE:
+    PLAYER_1.update()
+    PLAYER_2.update()
+    BALL.update()
 
-  if done:
+  if DONE:
     if SCORE_1 > SCORE_2:
-      text = font.render("Player 1 wins!", 1, (200, 200, 200))
+      TEXT = FONT.render("Player 1 wins!", 1, (200, 200, 200))
     else:
-      text = font.render("Player 2 wins!", 1, (200, 200, 200))
-    textpos = text.get_rect(centerx = background.get_width() / 2)
-    textpos.top = 50
-    DISPLAY.blit(text, textpos)
+      TEXT = FONT.render("Player 2 wins!", 1, (200, 200, 200))
+    TEST_POS = TEXT.get_rect(centerx=BACKGROUND.get_width() / 2)
+    TEST_POS.top = 50
+    DISPLAY.blit(TEXT, TEST_POS)
 
-  if pygame.sprite.spritecollide(player1, balls, False):
+  if pygame.sprite.spritecollide(PLAYER_1, BALLS, False):
 
-    diff = (player1.rect.x + player1.width / 2) - (ball.rect.x + ball.width / 2)
+    DIFF = (PLAYER_1.rect.x + PLAYER_1.width / 2) - (BALL.rect.x + BALL.width / 2)
 
-    ball.y = 570
-    ball.bounce(diff)
- 
-  if pygame.sprite.spritecollide(player2, balls, False):
+    BALL._y = 570 # pylint: disable = protected-access
+    BALL.bounce(DIFF)
 
-    diff = (player2.rect.x + player2.width / 2) - (ball.rect.x + ball.width / 2)
+  if pygame.sprite.spritecollide(PLAYER_2, BALLS, False):
 
-    ball.y = 40
-    ball.bounce(diff)
+    DIFF = (PLAYER_2.rect.x + PLAYER_2.width / 2) - (BALL.rect.x + BALL.width / 2)
 
-  scoreprint = "Player 1: "+str(SCORE_1)
-  text = font.render(scoreprint, 1, WHITE)
-  textpos = (0, 0)
-  DISPLAY.blit(text, textpos)
- 
-  scoreprint = "Player 2: "+str(SCORE_2)
-  text = font.render(scoreprint, 1, WHITE)
-  textpos = (680, 0)
-  DISPLAY.blit(text, textpos)
+    BALL._y = 40 # pylint: disable = protected-access
+    BALL.bounce(DIFF)
 
-  movingsprites.draw(DISPLAY)
+  SCORE_PRINT = "Player 1: "+str(SCORE_1)
+  TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
+  TEST_POS = (0, 0)
+  DISPLAY.blit(TEXT, TEST_POS)
+
+  SCORE_PRINT = "Player 2: "+str(SCORE_2)
+  TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
+  TEST_POS = (680, 0)
+  DISPLAY.blit(TEXT, TEST_POS)
+
+  MOVING_SPRITES.draw(DISPLAY)
 
   pygame.display.flip()
 
-  clock.tick(30)
+  CLOCK.tick(30)
 
 pygame.quit()
