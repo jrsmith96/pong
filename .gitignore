@@ -2,7 +2,10 @@
 .vscode
 
 # Visual Studio directory
-.vs/
+.vscode/
 
 # .pyc files
 *.pyc
+
+# Executable
+build/

@@ -51,7 +51,7 @@ def button(message, x, y, w, h, inactive, active, action=None):
   else:
     pygame.draw.rect(DISPLAY, inactive, (x, y, w, h))
 
-  small_text = pygame.font.Font("freesansbold.ttf", 20)
+  small_text = pygame.font.SysFont("comicsansms", 20)
   text_surf, text_rect = text_objects(message, small_text)
   text_rect.center = ((x + (w / 2)), (y + (h / 2)))
   DISPLAY.blit(text_surf, text_rect)
@@ -69,7 +69,7 @@ def title_screen():
       if instance.type == pygame.QUIT:
         pygame.quit()
         quit()
-    large_text = pygame.font.Font('freesansbold.ttf', 57)
+    large_text = pygame.font.SysFont("comicsansms", 57)
     text_surf, text_rect = text_objects("PONG", large_text)
     text_rect.center = ((400), (300))
     DISPLAY.blit(text_surf, text_rect)
