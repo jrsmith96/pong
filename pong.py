@@ -43,12 +43,11 @@ def button(message, x, y, w, h, inactive, active, action=None):
   if x + w > mouse[0] > x and y + h > mouse[1] > y:
     pygame.draw.rect(DISPLAY, active, (x, y, w, h))
     if click[0] == 1 and action != None:
+      # We desperately need a game_loop function
       if action == "play":
         print("Success!")
-      elif action == "quit":
-        pygame.quit()
-        quit()
-
+      else:
+        action()
   else:
     pygame.draw.rect(DISPLAY, inactive, (x, y, w, h))
 
@@ -56,6 +55,11 @@ def button(message, x, y, w, h, inactive, active, action=None):
   text_surf, text_rect = text_objects(message, small_text)
   text_rect.center = ((x + (w / 2)), (y + (h / 2)))
   DISPLAY.blit(text_surf, text_rect)
+
+def quit_game():
+  """Quits the game"""
+  pygame.quit()
+  quit()
 
 def title_screen():
   """Displays title screen for the start of the game"""
@@ -71,7 +75,7 @@ def title_screen():
     DISPLAY.blit(text_surf, text_rect)
 
     button("GO!", 150, 450, 100, 50, BLUE, BRIGHT_BLUE, "play")
-    button("Quit", 550, 450, 100, 50, RED, BRIGHT_RED, "quit")
+    button("Quit", 550, 450, 100, 50, RED, BRIGHT_RED, quit_game)
 
     pygame.display.update()
     CLOCK.tick(15)
@@ -176,7 +180,7 @@ class Ball(pygame.sprite.Sprite):
       pygame.mixer.Sound.play(BOUNCE_SOUND)
       self.direction = (360 - self.direction) % 360
 
-# title_screen()
+title_screen()
 
 pygame.display.set_caption('Pong')
 pygame.mouse.set_visible(0)
@@ -257,5 +261,3 @@ while not EXIT_PROGRAM:
   CLOCK.tick(30)
 
 pygame.quit()
-
-# We desperately need a game_loop function
