@@ -11,6 +11,9 @@ pygame.init()
 BOUNCE_SOUND = pygame.mixer.Sound('sounds/pong_bounce.ogg')
 VICTORY_SOUND = pygame.mixer.Sound('sounds/pong_victory.ogg')
 
+DISPLAY = pygame.display.set_mode([800, 600])
+CLOCK = pygame.time.Clock()
+
 WHITE = pygame.Color("white")
 
 SCORE_1 = 0
@@ -19,6 +22,29 @@ SCORE_2 = 0
 PAUSED = False
 FONT = pygame.font.Font(None, 36)
 VALUE = 0
+
+def text_objects(text, font):
+  textSurface = font.render(text, True, WHITE)
+  return textSurface, textSurface.get_rect()
+
+def title_screen():
+
+  TITLE = True
+
+  while TITLE:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        quit()
+    largeText = pygame.font.Font('freesansbold.ttf', 57)
+    textSurf, textRect = text_objects("PONG", largeText)
+    textRect.center = ((400), (300))
+    DISPLAY.blit(textSurf, textRect)
+
+    pygame.draw.rect(DISPLAY, pygame.Color("blue"), (150, 450, 100, 50))
+
+    pygame.display.update()
+    CLOCK.tick(15)
 
 def pause():
   """Pauses the game"""
@@ -157,84 +183,85 @@ class Player(pygame.sprite.Sprite):
     """Resets the player back to the center of the screen after a point is scored"""
     self.rect.x = (pygame.display.get_surface().get_width() / 2) - 37.5
 
-DISPLAY = pygame.display.set_mode([800, 600])
-pygame.display.set_caption('Pong')
-pygame.mouse.set_visible(0)
-BACKGROUND = pygame.Surface(DISPLAY.get_size())
+def game_loop():
+  pygame.display.set_caption('Pong')
+  pygame.mouse.set_visible(0)
+  BACKGROUND = pygame.Surface(DISPLAY.get_size())
 
-BALL = Ball()
-BALLS = pygame.sprite.Group()
-BALLS.add(BALL)
+  BALL = Ball()
+  BALLS = pygame.sprite.Group()
+  BALLS.add(BALL)
 
-PLAYER_1 = Player(580, 1)
-PLAYER_2 = Player(25, 2)
+  PLAYER_1 = Player(580, 1)
+  PLAYER_2 = Player(25, 2)
 
-MOVING_SPRITES = pygame.sprite.Group()
-MOVING_SPRITES.add(PLAYER_1)
-MOVING_SPRITES.add(PLAYER_2)
-MOVING_SPRITES.add(BALL)
+  MOVING_SPRITES = pygame.sprite.Group()
+  MOVING_SPRITES.add(PLAYER_1)
+  MOVING_SPRITES.add(PLAYER_2)
+  MOVING_SPRITES.add(BALL)
 
-CLOCK = pygame.time.Clock()
-DONE = False
-EXIT_PROGRAM = False
+  DONE = False
+  EXIT_PROGRAM = False
 
-while not EXIT_PROGRAM:
+  while not EXIT_PROGRAM:
 
-  DISPLAY.fill(pygame.Color("black"))
+    DISPLAY.fill(pygame.Color("black"))
 
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      EXIT_PROGRAM = True
-    if event.type == pygame.KEYUP:
-      if event.key == pygame.K_p:
-        PAUSED = True
-        pause()
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        EXIT_PROGRAM = True
+      if event.type == pygame.KEYUP:
+        if event.key == pygame.K_p:
+          PAUSED = True
+          pause()
 
-  if abs(SCORE_1 - SCORE_2) > 3:
-    DONE = True
+    if abs(SCORE_1 - SCORE_2) > 3:
+      DONE = True
 
-  if not DONE:
-    PLAYER_1.update()
-    PLAYER_2.update()
-    BALL.update()
+    if not DONE:
+      PLAYER_1.update()
+      PLAYER_2.update()
+      BALL.update()
 
-  if DONE:
-    if SCORE_1 > SCORE_2:
-      TEXT = FONT.render("Player 1 wins!", 1, (200, 200, 200))
-    else:
-      TEXT = FONT.render("Player 2 wins!", 1, (200, 200, 200))
-    TEST_POS = TEXT.get_rect(centerx=BACKGROUND.get_width() / 2)
-    TEST_POS.top = 50
+    if DONE:
+      if SCORE_1 > SCORE_2:
+        TEXT = FONT.render("Player 1 wins!", 1, (200, 200, 200))
+      else:
+        TEXT = FONT.render("Player 2 wins!", 1, (200, 200, 200))
+      TEST_POS = TEXT.get_rect(centerx=BACKGROUND.get_width() / 2)
+      TEST_POS.top = 50
+      DISPLAY.blit(TEXT, TEST_POS)
+
+    if pygame.sprite.spritecollide(PLAYER_1, BALLS, False):
+
+      DIFF = (PLAYER_1.rect.x + PLAYER_1.width / 2) - (BALL.rect.x + BALL.width / 2)
+
+      BALL._y = 570 # pylint: disable = protected-access
+      BALL.bounce(DIFF)
+
+    if pygame.sprite.spritecollide(PLAYER_2, BALLS, False):
+
+      DIFF = (PLAYER_2.rect.x + PLAYER_2.width / 2) - (BALL.rect.x + BALL.width / 2)
+
+      BALL._y = 40 # pylint: disable = protected-access
+      BALL.bounce(DIFF)
+
+    SCORE_PRINT = "Player 1: "+str(SCORE_1)
+    TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
+    TEST_POS = (0, 0)
     DISPLAY.blit(TEXT, TEST_POS)
 
-  if pygame.sprite.spritecollide(PLAYER_1, BALLS, False):
+    SCORE_PRINT = "Player 2: "+str(SCORE_2)
+    TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
+    TEST_POS = (680, 0)
+    DISPLAY.blit(TEXT, TEST_POS)
 
-    DIFF = (PLAYER_1.rect.x + PLAYER_1.width / 2) - (BALL.rect.x + BALL.width / 2)
+    MOVING_SPRITES.draw(DISPLAY)
 
-    BALL._y = 570 # pylint: disable = protected-access
-    BALL.bounce(DIFF)
+    pygame.display.flip()
 
-  if pygame.sprite.spritecollide(PLAYER_2, BALLS, False):
+    CLOCK.tick(30)
 
-    DIFF = (PLAYER_2.rect.x + PLAYER_2.width / 2) - (BALL.rect.x + BALL.width / 2)
-
-    BALL._y = 40 # pylint: disable = protected-access
-    BALL.bounce(DIFF)
-
-  SCORE_PRINT = "Player 1: "+str(SCORE_1)
-  TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
-  TEST_POS = (0, 0)
-  DISPLAY.blit(TEXT, TEST_POS)
-
-  SCORE_PRINT = "Player 2: "+str(SCORE_2)
-  TEXT = FONT.render(SCORE_PRINT, 1, WHITE)
-  TEST_POS = (680, 0)
-  DISPLAY.blit(TEXT, TEST_POS)
-
-  MOVING_SPRITES.draw(DISPLAY)
-
-  pygame.display.flip()
-
-  CLOCK.tick(30)
-
+title_screen()
+game_loop()
 pygame.quit()
