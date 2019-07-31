@@ -3,3 +3,6 @@
 
 # Visual Studio directory
 .vs/
+
+# .pyc files
+*.pyc
