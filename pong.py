@@ -12,6 +12,7 @@ TITLE = True
 
 # Sounds
 pygame.mixer.init(22100, -16, 2, 16)
+EASTER_EGG = pygame.mixer.music.load('sounds/crystal_shards.mp3')
 BOUNCE_SOUND = pygame.mixer.Sound('sounds/pong_bounce.ogg')
 VICTORY_SOUND = pygame.mixer.Sound('sounds/pong_victory.ogg')
 
@@ -74,7 +75,7 @@ def title_screen():
         quit()
     large_text = pygame.font.SysFont("comicsansms", 57)
     text_surf, text_rect = text_objects("PONG", large_text)
-    text_rect.center = ((400), (300))
+    text_rect.center = ((400), (200))
     DISPLAY.blit(text_surf, text_rect)
 
     button("GO!", 150, 450, 100, 50, BLUE, BRIGHT_BLUE, game_loop)
