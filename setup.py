@@ -3,7 +3,7 @@
 
 import cx_Freeze
 
-EXECUTABLES = [cx_Freeze.Executable("pong.py")]
+executables = [cx_Freeze.Executable("pong.py")] # pylint: disable = invalid-name
 
 cx_Freeze.setup(
   name="Pong",
@@ -16,5 +16,5 @@ cx_Freeze.setup(
       ]
     }
   },
-  EXECUTABLES=EXECUTABLES
+  executables=executables
 )
